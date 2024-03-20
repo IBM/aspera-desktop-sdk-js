@@ -1,4 +1,17 @@
-import {DesktopSpec, DesktopTransfer, ModifyTransferOptions, InstallerOptions, FileDialogOptions, FolderDialogOptions, TransferSpec, DesktopStyleFile, InstallerInfoResponse, DataTransferResponse, ResumeTransferOptions, WebsocketEvents} from './models';
+import {
+  DesktopSpec,
+  DesktopTransfer,
+  ModifyTransferOptions,
+  InstallerOptions,
+  FileDialogOptions,
+  FolderDialogOptions,
+  TransferSpec,
+  InstallerInfoResponse,
+  DataTransferResponse,
+  ResumeTransferOptions,
+  WebsocketEvents,
+  Pagination, PaginatedResponse, FileStat
+} from './models';
 import {errorLog} from '../helpers/helpers';
 import {websocketService} from '../helpers/ws';
 import {hiddenStyleList, protocol} from '../constants/constants';
@@ -237,6 +250,8 @@ export class Desktop {
   resumeTransfer: (transferId: string, options?: ResumeTransferOptions) => Promise<DesktopTransfer>;
   /** Function to get a list of all transfers */
   getAllTransfers: () => Promise<DesktopTransfer[]>;
+  /** Function to get the list of files for a specific transfer */
+  getFilesList: (transferId: string, pagination?: Pagination) => Promise<PaginatedResponse<FileStat>>;
   /** Function to get information for a specific transfer */
   getTransfer: (transferId: string) => Promise<DesktopTransfer>;
   /** Function to display a file dialog for the user to select files. */
@@ -262,4 +277,4 @@ export class Desktop {
   get isReady(): boolean {
     return this.globals.desktopVerified && this.globals.appId !== '';
   }
-};
+}

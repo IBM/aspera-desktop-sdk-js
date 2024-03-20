@@ -10,6 +10,7 @@ import {
   stopTransfer,
   resumeTransfer,
   getAllTransfers,
+  getFilesList,
   getTransfer,
   registerRemovedCallback,
   deregisterRemovedCallback,
@@ -38,6 +39,7 @@ asperaDesktop.showDirectory = showDirectory;
 asperaDesktop.stopTransfer = stopTransfer;
 asperaDesktop.resumeTransfer = resumeTransfer;
 asperaDesktop.getAllTransfers = getAllTransfers;
+asperaDesktop.getFilesList = getFilesList;
 asperaDesktop.getTransfer = getTransfer;
 asperaDesktop.registerRemovedCallback = registerRemovedCallback;
 asperaDesktop.deregisterRemovedCallback = deregisterRemovedCallback;

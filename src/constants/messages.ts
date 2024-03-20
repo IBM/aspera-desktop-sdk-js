@@ -4,6 +4,7 @@ export const messages = {
   failedToGenerateIframe: 'Unable to generate IFRAME for download. Using new window',
   getInstallerError: 'Unable to get latest installers',
   getAllTransfersFailed: 'Unable to get all transfers',
+  getFilesListFailed: 'Unable to get the list of files',
   getTransferFailed: 'Unable to get transfer',
   invalidEndpoint: 'The specified endpoint is not a valid URL',
   loadingProtocol: 'Launching IBM Aspera for Desktop',

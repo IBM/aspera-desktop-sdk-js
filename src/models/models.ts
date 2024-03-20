@@ -465,3 +465,48 @@ export interface WebsocketMessage {
   params: any;
   id: number;
 }
+
+export interface PaginatedResponse<T> {
+  /// The paginated list of resources.
+  entries: T[];
+  /// The total number of resources.
+  total_count: number;
+  /// Pagination fields.
+  pagination: Pagination;
+}
+
+export interface Pagination {
+  /// The maximum number of items to return per page.
+  limit: number;
+  /// The offset of the item at which to begin.
+  offset: number;
+}
+
+export interface FileStat {
+  /// Full path to the file.
+  file: string;
+  /// Total number of bytes written.
+  bytes_written: number;
+  /// The size of the file.
+  bytes_expected: number;
+  /// Aggregate time elapsed during the current session.
+  elapsed_usec: number;
+  /// File error, if any.
+  error?: FileError;
+  /// File status.
+  status: FileStatus;
+}
+
+export interface FileError {
+  /// Error code.
+  code: number;
+  /// Error description.
+  description: string;
+}
+
+export enum FileStatus {
+  Failed,
+  Skipped,
+  Finished,
+  Running,
+}

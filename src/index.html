@@ -251,6 +251,19 @@
         })
       }
 
+      function getFilesList(id) {
+        const pagination = {
+          limit: 10,
+          offset: 0,
+        }
+
+        asperaDesktop.getFilesList(id, pagination).then(response => {
+          console.log('GET FILES LIST SUCCESS', response);
+        }).catch(error => {
+          console.log('GET FILES LIST FAIL', error);
+        })
+      }
+
       function testDrop() {
         const callback = files => {
           console.log('DROP ZONE CALLBACK', files);
@@ -299,6 +312,7 @@
             <button onclick=getTransfer("${transfer.uuid}")>Info</button>
             <button onclick=showDirectory("${transfer.uuid}")>Show</button>
             <button onclick=modifyTransfer("${transfer.uuid}")>Modify</button>
+            <button onclick=getFilesList("${transfer.uuid}")>Files list</button>
           `;
           transferDom.appendChild(element);
         });
