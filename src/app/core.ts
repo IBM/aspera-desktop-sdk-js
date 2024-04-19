@@ -11,7 +11,7 @@ import {
   FileDialogOptions, FileStat,
   FolderDialogOptions,
   ModifyTransferOptions,
-  PaginatedResponse, Pagination,
+  PaginatedResponse,
   ResumeTransferOptions,
   TransferSpec
 } from '../models/models';
@@ -522,7 +522,7 @@ export const removeDropzone = (elementSelector: string): void => {
  *
  * @returns a promise that resolves with an `PaginatedResponse` of `FileStat`.
  */
-export const getFilesList = (id: string, pagination?: Pagination): Promise<PaginatedResponse<FileStat>> => {
+export const getFilesList = (id: string, limit: number, offset: number): Promise<PaginatedResponse<FileStat>> => {
   if (!asperaDesktop.isReady) {
     return throwError(messages.serverNotVerified);
   }
@@ -531,7 +531,8 @@ export const getFilesList = (id: string, pagination?: Pagination): Promise<Pagin
 
   const payload = {
     transfer_id: id,
-    pagination,
+    limit,
+    offset
   };
 
   client.request('get_files_list', payload)

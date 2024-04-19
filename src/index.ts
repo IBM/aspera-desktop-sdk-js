@@ -98,6 +98,7 @@ export default {
   stopTransfer,
   resumeTransfer,
   getAllTransfers,
+  getFilesList,
   getTransfer,
   registerRemovedCallback,
   deregisterRemovedCallback,

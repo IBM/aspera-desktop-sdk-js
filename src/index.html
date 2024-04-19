@@ -252,12 +252,7 @@
       }
 
       function getFilesList(id) {
-        const pagination = {
-          limit: 10,
-          offset: 0,
-        }
-
-        asperaDesktop.getFilesList(id, pagination).then(response => {
+        asperaDesktop.getFilesList(id, 10, 0).then(response => {
           console.log('GET FILES LIST SUCCESS', response);
         }).catch(error => {
           console.log('GET FILES LIST FAIL', error);

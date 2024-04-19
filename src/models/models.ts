@@ -471,11 +471,6 @@ export interface PaginatedResponse<T> {
   entries: T[];
   /// The total number of resources.
   total_count: number;
-  /// Pagination fields.
-  pagination: Pagination;
-}
-
-export interface Pagination {
   /// The maximum number of items to return per page.
   limit: number;
   /// The offset of the item at which to begin.
@@ -505,8 +500,8 @@ export interface FileError {
 }
 
 export enum FileStatus {
-  Failed,
-  Skipped,
-  Finished,
-  Running,
+  Failed = 'failed',
+  Skipped = 'skipped',
+  Finished = 'finished',
+  Running = 'running',
 }
