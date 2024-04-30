@@ -49,20 +49,9 @@ export const initDragDrop = (): Promise<boolean> => {
  * @returns a promise that resolves if the websocket connection is successful
  */
 export const initWebSocketConnection = (): Promise<any> => {
-  const getPort = require('get-port');
-  const promiseInfo = generatePromiseObjects();
-
-  getPort({port: getPort.portNumbers(33024, 33029)}).then((availablePort: number) => {
-    const desktopUrl = `http://127.0.0.1:${availablePort}`;
-
-    asperaDesktop.globals.desktopUrl = desktopUrl;
-    asperaDesktop.activityTracking.setup(getWebsocketUrl(desktopUrl), asperaDesktop.globals.appId)
-      .then(() => testDesktopConnection())
-      .then(() => initDragDrop())
-      .then((success) => promiseInfo.resolver(success));
-  });
-
-  return promiseInfo.promise;
+  return asperaDesktop.activityTracking.setup(getWebsocketUrl(asperaDesktop.globals.desktopUrl), asperaDesktop.globals.appId)
+    .then(() => testDesktopConnection())
+    .then(() => initDragDrop());
 };
 
 /**

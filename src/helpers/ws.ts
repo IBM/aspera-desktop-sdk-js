@@ -76,7 +76,7 @@ export class WebsocketService {
 
       setTimeout(() => {
         this.globalSocket.close();
-        this.init(this.websocketUrl, this.appId);
+        this.init(this.websocketUrl, this.appId).then();
       }, 3000);
     }
   }
@@ -148,17 +148,53 @@ export class WebsocketService {
    * @returns a promise that resolves when the websocket connection is established
    */
   init(socketUrl: string, appId: string): Promise<any> {
-    this.websocketUrl = socketUrl;
     this.appId = appId;
 
-    this.globalSocket = new WebSocket(this.websocketUrl);
+    this.getWebSocketConnection(socketUrl).then((webSocket) => {
+      this.websocketUrl = webSocket.url;
+      this.globalSocket = new WebSocket(this.websocketUrl);
 
-    this.globalSocket.onerror = this.handleError;
-    this.globalSocket.onclose = this.handleClosed;
-    this.globalSocket.onopen = this.handleOpen;
-    this.globalSocket.onmessage = this.handleMessage;
+      this.globalSocket.onerror = this.handleError;
+      this.globalSocket.onclose = this.handleClosed;
+      this.globalSocket.onopen = this.handleOpen;
+      this.globalSocket.onmessage = this.handleMessage;
+    }).catch((error) => {
+      this.initPromise.rejecter(error);
+    });
 
     return this.initPromise.promise;
+  }
+
+  private async getWebSocketConnection(url: string): Promise<WebSocket> {
+    const promiseInfo = generatePromiseObjects();
+    const maxPort = 33029;
+    let currentPort = 33024;
+
+    while (currentPort < maxPort) {
+      try {
+        return await this.connectWebSocket(url, currentPort);
+      } catch (error) {
+        currentPort++;
+      }
+    }
+
+    return promiseInfo.promise;
+  }
+
+  private connectWebSocket(url: string, port: number): Promise<WebSocket> {
+    const promiseInfo = generatePromiseObjects();
+    const portUrl = `${url}:${port}`;
+    const webSocket = new WebSocket(portUrl);
+
+    webSocket.onopen = () => {
+      promiseInfo.resolver(webSocket);
+    };
+
+    webSocket.onerror = (error: any) => {
+      promiseInfo.rejecter(error);
+    };
+
+    return promiseInfo.promise;
   }
 }
 

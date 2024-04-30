@@ -47,7 +47,6 @@
     "webpack-dev-server": "^4.11.1"
   },
   "dependencies": {
-    "get-port": "^7.1.0",
     "json-rpc-2.0": "^1.6.0"
   }
 }

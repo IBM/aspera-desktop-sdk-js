@@ -6,7 +6,7 @@ import {messages} from '../constants/messages';
 
 class DesktopGlobals {
   /** The URL of the IBM Aspera Desktop HTTP server to use with the SDK */
-  desktopUrl = 'http://127.0.0.1:33024';
+  desktopUrl = 'http://127.0.0.1';
   /** The default URL to check for latest Aspera Desktop installers */
   installerUrl = 'https://d3gcli72yxqn2z.cloudfront.net/downloads/desktop/latest/stable';
   /** Desktop info */
