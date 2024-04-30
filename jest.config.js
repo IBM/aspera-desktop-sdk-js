@@ -12,5 +12,4 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest'
   },
   'testRegex': '/tests/.*\\.spec\\.ts$',
-  'transformIgnorePatterns': ['/node_modules/(?!get-port)'],
 };
