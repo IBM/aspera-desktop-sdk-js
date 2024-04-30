@@ -1,7 +1,10 @@
 import {TransferResponse} from '../models/aspera-desktop.model';
 import {WebsocketMessage, WebsocketTopics} from '../models/models';
 import {messages} from '../constants/messages';
-import {errorLog, generatePromiseObjects} from './helpers';
+import {errorLog, generatePromiseObjects, getWebsocketUrl} from './helpers';
+import {asperaDesktop} from '../index';
+
+const MAX_PORT = 33029;
 
 export class WebsocketService {
   /** The main websocket connection to Aspera Desktop */
@@ -167,16 +170,31 @@ export class WebsocketService {
 
   private async getWebSocketConnection(url: string): Promise<WebSocket> {
     const promiseInfo = generatePromiseObjects();
-    const maxPort = 33029;
-    let currentPort = 33024;
 
-    while (currentPort < maxPort) {
-      try {
-        return await this.connectWebSocket(url, currentPort);
-      } catch (error) {
-        currentPort++;
-      }
-    }
+    (async () => {
+      const regex = /(.*):(\d+)$/;
+      const matches = regex.exec(url);
+
+      const urlHost = matches[1];
+      let currentPort = +matches[2];
+
+      do {
+        try {
+          const socketUrl = getWebsocketUrl(urlHost);
+          const webSocket = await this.connectWebSocket(socketUrl, currentPort);
+
+          // Update desktopUrl with the bound port
+          asperaDesktop.globals.desktopUrl = `${urlHost}:${currentPort}`;
+
+          promiseInfo.resolver(webSocket);
+          break;
+        } catch (error) {
+          currentPort++;
+        }
+      } while (currentPort < MAX_PORT);
+    })().catch((error) => {
+      promiseInfo.rejecter(error);
+    });
 
     return promiseInfo.promise;
   }

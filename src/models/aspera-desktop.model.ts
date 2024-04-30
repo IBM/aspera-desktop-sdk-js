@@ -6,7 +6,7 @@ import {messages} from '../constants/messages';
 
 class DesktopGlobals {
   /** The URL of the IBM Aspera Desktop HTTP server to use with the SDK */
-  desktopUrl = 'http://127.0.0.1';
+  desktopUrl = 'http://127.0.0.1:33024';
   /** The default URL to check for latest Aspera Desktop installers */
   installerUrl = 'https://d3gcli72yxqn2z.cloudfront.net/downloads/desktop/latest/stable';
   /** Desktop info */
@@ -114,11 +114,14 @@ export class ActivityTracking {
    *
    * Currently, this promise does not reject.
    */
-  async setup(url: string, appId: string): Promise<any> {
-    const response = await websocketService.init(url, appId);
-    websocketService.registerMessage('transfer_activity', (data: ActivityMessage) => this.handleTransferActivity(data));
-    websocketService.registerEvent((status: 'CLOSED' | 'RECONNECT') => this.handleWebSocketEvents(status));
-    return response;
+  setup(url: string, appId: string): Promise<any> {
+    return websocketService.init(url, appId)
+      .then((response) => {
+        websocketService.registerMessage('transfer_activity', (data: ActivityMessage) => this.handleTransferActivity(data));
+        websocketService.registerEvent((status: 'CLOSED'|'RECONNECT') => this.handleWebSocketEvents(status));
+
+        return response;
+      });
   }
 
   /**

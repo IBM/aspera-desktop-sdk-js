@@ -49,7 +49,7 @@ export const initDragDrop = (): Promise<boolean> => {
  * @returns a promise that resolves if the websocket connection is successful
  */
 export const initWebSocketConnection = (): Promise<any> => {
-  return asperaDesktop.activityTracking.setup(getWebsocketUrl(asperaDesktop.globals.desktopUrl), asperaDesktop.globals.appId)
+  return asperaDesktop.activityTracking.setup(asperaDesktop.globals.desktopUrl, asperaDesktop.globals.appId)
     .then(() => testDesktopConnection())
     .then(() => initDragDrop());
 };
