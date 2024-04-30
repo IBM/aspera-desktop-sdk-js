@@ -1,5 +1,5 @@
 import {client} from '../src/helpers/client';
-import {asperaDesktop} from '../src/index';
+import {asperaDesktop} from '../src';
 import {mockFetch} from './mocks';
 
 let id = 0;

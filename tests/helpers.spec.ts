@@ -1,5 +1,11 @@
-import { JSONRPCErrorException } from 'json-rpc-2.0';
-import {errorLog, generateErrorBody, generatePromiseObjects, isValidTransferSpec, isValidURL} from '../src/helpers/helpers';
+import {JSONRPCErrorException} from 'json-rpc-2.0';
+import {
+  errorLog,
+  generateErrorBody,
+  generatePromiseObjects,
+  isValidTransferSpec,
+  isValidURL
+} from '../src/helpers/helpers';
 import {TransferSpec} from '../src/models/models';
 
 describe('generatePromiseObjects', () => {
@@ -20,8 +26,7 @@ describe('errorLog', () => {
   });
 
   test('with message and no debug data should store in array and console', () => {
-    const consoleWarnCall = jest.fn();
-    console.warn = consoleWarnCall;
+    console.warn = jest.fn();
     const testMessage = 'Test message';
     expect((<any>window).asperaDesktopLogs).toBe(undefined);
     errorLog(testMessage);

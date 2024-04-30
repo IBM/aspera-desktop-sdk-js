@@ -1,4 +1,4 @@
-import {getInstallerInfo} from '../src/app/installer';
+import {getInstallerInfo} from '../src';
 import {mockFetch} from './mocks';
 
 describe('getInstallerInfo', () => {
@@ -112,23 +112,23 @@ describe('getInstallerInfo', () => {
     (<any>global).fetch = mockFetch(response);
     const data = await getInstallerInfo({endpoint: 'https://aspera.us/aspera/desktop', all: true});
     for (const entry of data.entries) {
-        expect(entry.url.startsWith('https://aspera.us/aspera/desktop/downloads/ibm-aspera-desktop')).toBe(true);
+      expect(entry.url.startsWith('https://aspera.us/aspera/desktop/downloads/ibm-aspera-desktop')).toBe(true);
     }
   });
 
   test('called with invalid endpoint rejects', () => {
     const response = {
-        entries: [
-          {
-            'version': '1.2.0',
-            'platform': 'macos',
-            'type': 'dmg',
-            'arch': 'universal',
-            'url': 'downloads/ibm-aspera-desktop_1.2.0_macos.dmg'
-          }
-        ]
+      entries: [
+        {
+          'version': '1.2.0',
+          'platform': 'macos',
+          'type': 'dmg',
+          'arch': 'universal',
+          'url': 'downloads/ibm-aspera-desktop_1.2.0_macos.dmg'
+        }
+      ]
     };
     (<any>global).fetch = mockFetch(response);
-    return expect(getInstallerInfo({endpoint: 'aspera.us'})).rejects.toMatchObject({error: true})
+    return expect(getInstallerInfo({endpoint: 'aspera.us'})).rejects.toMatchObject({error: true});
   });
 });

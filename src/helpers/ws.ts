@@ -143,6 +143,7 @@ export class WebsocketService {
    * This function starts the websocket subscription with the websocket provider
    *
    * @param socketUrl - the websocket URL to use
+   * @param appId - the App Id
    *
    * @returns a promise that resolves when the websocket connection is established
    */

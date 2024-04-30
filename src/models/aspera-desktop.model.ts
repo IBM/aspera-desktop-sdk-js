@@ -71,7 +71,7 @@ export class ActivityTracking {
   /**
    * Notify all consumers when a message is received from the websocket
    *
-   * @param data the data received from the websocket
+   * @param message the data received from the websocket
    */
   private handleTransferActivity(message: ActivityMessage): void {
     if (message.type === 'transferUpdated') {
@@ -88,7 +88,7 @@ export class ActivityTracking {
           callback(message.data);
         }
       });
-    };
+    }
   }
 
   /**
@@ -109,18 +109,16 @@ export class ActivityTracking {
    * Set up the websocket connection to IBM Aspera Desktop
    *
    * @param url websocket URL
-   *
+   * @param appId the App Id
    * @returns a promise that resolves when the websocket connection is established.
-   * Currently this promise does not reject.
+   *
+   * Currently, this promise does not reject.
    */
-  setup(url: string, appId: string): Promise<any> {
-    return websocketService.init(url, appId)
-      .then((response) => {
-        websocketService.registerMessage('transfer_activity', (data: ActivityMessage) => this.handleTransferActivity(data));
-        websocketService.registerEvent((status: 'CLOSED'|'RECONNECT') => this.handleWebSocketEvents(status));
-
-        return response;
-      });
+  async setup(url: string, appId: string): Promise<any> {
+    const response = await websocketService.init(url, appId);
+    websocketService.registerMessage('transfer_activity', (data: ActivityMessage) => this.handleTransferActivity(data));
+    websocketService.registerEvent((status: 'CLOSED' | 'RECONNECT') => this.handleWebSocketEvents(status));
+    return response;
   }
 
   /**
@@ -264,4 +262,4 @@ export class Desktop {
   get isReady(): boolean {
     return this.globals.desktopVerified && this.globals.appId !== '';
   }
-};
+}
