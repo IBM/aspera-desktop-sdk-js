@@ -1,6 +1,7 @@
 /** @ignore */
 export const messages = {
   callbackIsNotFunction: 'The provided callback is not a function',
+  dragDropInitFailed: 'Unable to initialize drag-drop',
   failedToGenerateIframe: 'Unable to generate IFRAME for download. Using new window',
   getInstallerError: 'Unable to get latest installers',
   getAllTransfersFailed: 'Unable to get all transfers',
@@ -12,6 +13,7 @@ export const messages = {
   removeTransferFailed: 'Unable to remove transfer',
   serverError: 'Unable to connect to IBM Aspera Desktop server',
   serverNotVerified: 'IBM Aspera Desktop has not been verified. Run test or init first',
+  setBrandingFailed: 'Unable to set custom branding',
   showDirectoryFailed: 'Unable to show transfer directory',
   showSelectFileDialogFailed: 'Unable to show select file dialog',
   showSelectFolderDialogFailed: 'Unable to show select folder dialog',
