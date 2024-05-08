@@ -6,5 +6,7 @@
     "target": "es5",
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "preserveConstEnums": true,
+    "stripInternal": true
   }
 }
