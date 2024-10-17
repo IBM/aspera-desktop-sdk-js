@@ -1,28 +1,16 @@
-import {
-  CustomBrandingOptions,
-  DataTransferResponse,
-  DesktopSpec,
-  DesktopTransfer,
-  FileDialogOptions,
-  FolderDialogOptions,
-  InstallerInfoResponse,
-  InstallerOptions,
-  ModifyTransferOptions,
-  ResumeTransferOptions,
-  SafariExtensionEvents,
-  TransferSpec,
-  WebsocketEvents
-} from './models';
+import {CustomBrandingOptions, DataTransferResponse, DesktopSpec, DesktopTransfer, FileDialogOptions, FolderDialogOptions, InitOptions, InstallerInfoResponse, InstallerOptions, ModifyTransferOptions, ResumeTransferOptions, SafariExtensionEvents, TransferSpec, WebsocketEvents} from './models';
 import {hiddenStyleList, protocol} from '../constants/constants';
 import {messages} from '../constants/messages';
 import {safariClient} from '../helpers/client/safari-client';
-import {errorLog, getWebsocketUrl, isSafari} from '../helpers/helpers';
+import {errorLog, isSafari} from '../helpers/helpers';
 import {websocketService} from '../helpers/ws';
 import {asperaDesktop} from '../index';
 
 class DesktopGlobals {
   /** The URL of the IBM Aspera Desktop HTTP server to use with the SDK */
-  desktopUrl = 'http://127.0.0.1:33024';
+  desktopUrl = 'http://127.0.0.1';
+  /** The URL of the IBM Aspera Desktop HTTP server to use with the SDK */
+  rpcPort = 33024;
   /** The default URL to check for latest Aspera Desktop installers */
   installerUrl = 'https://d3gcli72yxqn2z.cloudfront.net/downloads/desktop/latest/stable';
   /** Desktop info */
@@ -31,8 +19,10 @@ class DesktopGlobals {
   desktopVerified = false;
   /** The unique ID for the website */
   appId: string;
-  /** Map of dropzones created by querySelector */
-  dropzonesCreated: Map<string, {event: string; callback: (event: any) => void}[]> = new Map();
+  /** The session ID for the current user */
+  sessionId?: string;
+  /** Map of drop zones created by querySelector */
+  dropZonesCreated: Map<string, {event: string; callback: (event: any) => void}[]> = new Map();
 
   backupLaunchMethod(url: string): void {
     window.alert(messages.loadingProtocol);
@@ -163,14 +153,16 @@ export class ActivityTracking {
    * @returns a promise that resolves when the websocket connection is established.
    * Currently, this promise does not reject.
    */
-  setup(appId: string): Promise<unknown> {
+  setup(): Promise<unknown> {
+    if (asperaDesktop.globals.sessionId) {
+      this.registerDesktopAppSession();
+    }
+
     if (isSafari()) {
       return safariClient.monitorTransferActivity();
     }
 
-    const url = getWebsocketUrl(asperaDesktop.globals.desktopUrl);
-
-    return websocketService.init(url, appId)
+    return websocketService.init()
       .then(() => {
         websocketService.registerMessage('transfer_activity', (data: ActivityMessage) => this.handleTransferActivity(data));
         websocketService.registerEvent((status: 'CLOSED'|'RECONNECT') => this.handleWebSocketEvents(status));
@@ -282,6 +274,17 @@ export class ActivityTracking {
   removeSafariExtensionEventCallback(id: string): void {
     this.safari_extension_callbacks.delete(id);
   }
+
+  private registerDesktopAppSession(): void {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = `aspera://initialize?app_id=${asperaDesktop.globals.appId}&session_id=${asperaDesktop.globals.sessionId}`;
+    document.body.appendChild(iframe);
+
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+    }, 1000);
+  }
 }
 
 export class Desktop {
@@ -289,6 +292,8 @@ export class Desktop {
   globals: DesktopGlobals = new DesktopGlobals();
   /** Activity tracking for watching transfers */
   activityTracking: ActivityTracking = new ActivityTracking();
+  /** Function to initialize IBM Aspera Desktop with options */
+  init: (options: InitOptions) => Promise<any>;
   /** Function to initialize IBM Aspera Desktop */
   initDesktop: (appId: string) => Promise<any>;
   /** Function to test the IBM Aspera Desktop status */

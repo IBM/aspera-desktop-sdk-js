@@ -1,29 +1,9 @@
 import {messages} from '../constants/messages';
 import {client} from '../helpers/client/client';
-import {
-  errorLog,
-  generateErrorBody,
-  generatePromiseObjects,
-  isValidTransferSpec,
-  randomUUID,
-  throwError
-} from '../helpers/helpers';
+import {errorLog, generateErrorBody, generatePromiseObjects, isValidTransferSpec, randomUUID, throwError} from '../helpers/helpers';
 import {asperaDesktop} from '../index';
 import {DesktopInfo, TransferResponse} from '../models/aspera-desktop.model';
-import {
-  CustomBrandingOptions,
-  DataTransferResponse,
-  DesktopSpec,
-  DesktopStyleFile,
-  DesktopTransfer,
-  FileDialogOptions,
-  FolderDialogOptions,
-  ModifyTransferOptions,
-  ResumeTransferOptions,
-  SafariExtensionEvents,
-  TransferSpec,
-  WebsocketEvents
-} from '../models/models';
+import {CustomBrandingOptions, DataTransferResponse, DesktopSpec, DesktopStyleFile, DesktopTransfer, FileDialogOptions, FolderDialogOptions, InitOptions, ModifyTransferOptions, ResumeTransferOptions, SafariExtensionEvents, TransferSpec, WebsocketEvents} from '../models/models';
 
 /**
  * Check if IBM Aspera Desktop connection works. This function is called by init
@@ -66,6 +46,48 @@ export const initDragDrop = (): Promise<boolean> => {
  * Initialize IBM Aspera Desktop client. If client cannot (reject/catch), then
  * client should attempt fixing server URL or trying again. If still fails disable UI elements.
  *
+ * @param options initialization options:
+ *
+ * - `appId` the unique ID for the website. Transfers initiated during this session
+ * will be associated with this ID. It is recommended to use a unique ID to keep transfer
+ * information private from other websites.
+ *
+ * - `supportMultipleUsers` when enabled (defaults to false), the SDK will iterate over a port
+ * range and generate a session id to determine the running instance of the desktop app for the
+ * current user. This is needed when multiple users may be logged into the same machine
+ * simultaneously, for example on a Windows Server.
+ *
+ * @returns a promise that resolves if IBM Aspera Desktop is running properly or
+ * rejects if unable to connect
+ */
+export const init = (options?: InitOptions): Promise<any> => {
+  const appId = options?.appId ?? randomUUID();
+  const supportMultipleUsers = options?.supportMultipleUsers ?? false;
+
+  if (asperaDesktop.globals.desktopVerified) {
+    return throwError(messages.sdkAlreadyInitialized);
+  }
+
+  asperaDesktop.globals.appId = appId;
+
+  if (supportMultipleUsers) {
+    asperaDesktop.globals.sessionId = randomUUID();
+  }
+
+  return asperaDesktop.activityTracking.setup()
+    .then(() => testDesktopConnection())
+    .then(() => initDragDrop())
+    .catch(error => {
+      errorLog(messages.serverError, error);
+      asperaDesktop.globals.desktopVerified = false;
+      throw generateErrorBody(messages.serverError, error);
+    });
+};
+
+/**
+ * Initialize IBM Aspera Desktop client. If client cannot (reject/catch), then
+ * client should attempt fixing server URL or trying again. If still fails disable UI elements.
+ *
  * @param appId the unique ID for the website. Transfers initiated during this session
  * will be associated with this ID. It is recommended to use a unique ID to keep transfer
  * information private from other websites.
@@ -74,16 +96,7 @@ export const initDragDrop = (): Promise<boolean> => {
  * rejects if unable to connect
  */
 export const initDesktop = (appId?: string): Promise<any> => {
-  asperaDesktop.globals.appId = appId ? appId : randomUUID();
-
-  return asperaDesktop.activityTracking.setup(asperaDesktop.globals.appId)
-    .then(() => testDesktopConnection())
-    .then(() => initDragDrop())
-    .catch(error => {
-      errorLog(messages.serverError, error);
-      asperaDesktop.globals.desktopVerified = false;
-      throw generateErrorBody(messages.serverError, error);
-    });
+  return init({appId});
 };
 
 /**
@@ -575,7 +588,7 @@ export const createDropzone = (
   elements.forEach(element => {
     element.addEventListener('dragover', dragEvent);
     element.addEventListener('drop', dropEvent);
-    asperaDesktop.globals.dropzonesCreated.set(elementSelector, [{event: 'dragover', callback: dragEvent}, {event: 'drop', callback: dropEvent}]);
+    asperaDesktop.globals.dropZonesCreated.set(elementSelector, [{event: 'dragover', callback: dragEvent}, {event: 'drop', callback: dropEvent}]);
   });
 };
 
@@ -585,7 +598,7 @@ export const createDropzone = (
  * @param elementSelector the selector of the element on the page that should remove
  */
 export const removeDropzone = (elementSelector: string): void => {
-  const foundDropzone = asperaDesktop.globals.dropzonesCreated.get(elementSelector);
+  const foundDropzone = asperaDesktop.globals.dropZonesCreated.get(elementSelector);
 
   if (foundDropzone) {
     foundDropzone.forEach(data => {
